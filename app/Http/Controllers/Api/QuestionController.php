@@ -12,17 +12,11 @@ class QuestionController extends Controller
 {
     public function store(Request $request): JsonResponse
     {
-        $validated = $request->validate([
+        $validated = $request->validate(array_merge(Question::rules(), [
             'topic_slug' => 'required|exists:topics,slug',
-            'type' => 'required|in:mcq,short_answer,coding',
-            'difficulty' => 'required|string',
-            'prompt' => 'required|string',
-            'reference_answer' => 'required|string',
-            'language' => 'nullable|in:javascript,php',
-            'test_cases' => 'nullable|array',
             'status' => 'nullable|in:draft,approved',
             'generated_by' => 'nullable|string',
-        ]);
+        ]));
 
         $topic = Topic::where('slug', $validated['topic_slug'])->firstOrFail();
 

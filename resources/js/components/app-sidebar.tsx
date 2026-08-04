@@ -4,7 +4,7 @@ import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { BarChart3, BookOpen, Folder, LayoutGrid, ListChecks } from 'lucide-react';
+import { BarChart3, BookOpen, Folder, LayoutGrid, ListChecks, PlusSquare } from 'lucide-react';
 import AppLogo from './app-logo';
 
 const mainNavItems: NavItem[] = [
@@ -17,6 +17,11 @@ const mainNavItems: NavItem[] = [
         title: 'Topics',
         url: '/topics',
         icon: ListChecks,
+    },
+    {
+        title: 'Manage questions',
+        url: '/questions/manage',
+        icon: PlusSquare,
     },
     {
         title: 'Progress',

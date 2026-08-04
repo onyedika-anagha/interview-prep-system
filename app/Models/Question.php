@@ -42,4 +42,22 @@ class Question extends Model
     {
         return $this->hasMany(Attempt::class);
     }
+
+    /**
+     * Shared field validation, reused by the MCP-facing API controller, the
+     * web management controller, and JSON bulk import (one rule set per row).
+     *
+     * @return array<string, string>
+     */
+    public static function rules(): array
+    {
+        return [
+            'type' => 'required|in:mcq,short_answer,coding',
+            'difficulty' => 'required|string',
+            'prompt' => 'required|string',
+            'reference_answer' => 'required|string',
+            'language' => 'nullable|in:javascript,php',
+            'test_cases' => 'nullable|array',
+        ];
+    }
 }

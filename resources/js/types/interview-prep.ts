@@ -48,3 +48,20 @@ export interface TopicProgress {
     accuracy: number;
     current_streak: number;
 }
+
+export interface DraftQuestion {
+    id: number;
+    topic_id: number;
+    type: QuestionType;
+    difficulty: string;
+    prompt: string;
+    generated_by: string;
+    created_at: string;
+    topic: { id: number; name: string };
+}
+
+export interface QuestionActionResult {
+    type: 'generated' | 'added' | 'imported';
+    created: number;
+    errors: string[];
+}
