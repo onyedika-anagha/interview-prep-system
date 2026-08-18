@@ -8,11 +8,10 @@ use App\Http\Controllers\QuizController;
 use App\Http\Controllers\TopicController;
 use App\Http\Middleware\AutoLoginLocalUser;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
 
-Route::get('/', function () {
-    return Inertia::render('welcome');
-})->name('home');
+// Local/single-user app (PRD FR14) — there's no one to market to, so '/' skips
+// the stock starter-kit marketing page and goes straight into the app.
+Route::redirect('/', '/topics')->name('home');
 
 Route::middleware(['auth'])->group(function () {
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
@@ -24,6 +23,7 @@ Route::middleware([AutoLoginLocalUser::class])->group(function () {
     Route::get('topics', [TopicController::class, 'index'])->name('topics.index');
     Route::get('topics/{topic:slug}/quiz', [QuizController::class, 'show'])->name('quiz.show');
     Route::post('questions/{question}/attempts', [AttemptController::class, 'store'])->name('attempts.store');
+    Route::post('questions/{question}/attempts/{attempt}/feedback', [AttemptController::class, 'feedback'])->name('attempts.feedback');
     Route::post('questions/{question}/run', [QuizController::class, 'run'])->name('quiz.run');
     Route::get('questions/{question}/back', [QuizController::class, 'back'])->name('quiz.back');
     Route::get('progress', [ProgressController::class, 'index'])->name('progress.index');

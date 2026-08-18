@@ -1,10 +1,11 @@
+import { CodeEditor } from '@/components/quiz/code-editor';
 import { TestCaseResults } from '@/components/test-case-results';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Textarea } from '@/components/ui/textarea';
 import { type QuizQuestion, type TestCaseResult } from '@/types/interview-prep';
-import { type KeyboardEvent, useId } from 'react';
+import { useId } from 'react';
 
 interface AnswerFormProps {
     question: QuizQuestion;
@@ -33,20 +34,6 @@ export function AnswerForm({
     const isMcq = question.type === 'mcq' && !!question.options?.length;
     const answerId = useId();
 
-    // Native textareas move focus to the next element on Tab, which makes indenting code impossible.
-    const handleTabIndent = (e: KeyboardEvent<HTMLTextAreaElement>) => {
-        if (e.key !== 'Tab') return;
-        e.preventDefault();
-
-        const target = e.currentTarget;
-        const { selectionStart, selectionEnd } = target;
-        onAnswerChange(answer.slice(0, selectionStart) + '  ' + answer.slice(selectionEnd));
-
-        requestAnimationFrame(() => {
-            target.selectionStart = target.selectionEnd = selectionStart + 2;
-        });
-    };
-
     return (
         <form
             className="flex flex-col gap-3"
@@ -56,31 +43,47 @@ export function AnswerForm({
             }}
         >
             {isMcq ? (
-                <RadioGroup value={answer} onValueChange={onAnswerChange}>
-                    {question.options?.map((option, index) => (
-                        <div key={index} className="flex items-center gap-2">
-                            <RadioGroupItem value={option} id={`option-${index}`} />
-                            <Label htmlFor={`option-${index}`} className="font-normal">
-                                {option}
-                            </Label>
-                        </div>
-                    ))}
+                <RadioGroup value={answer} onValueChange={onAnswerChange} className="gap-2">
+                    {question.options?.map((option, index) => {
+                        const optionId = `${answerId}-option-${index}`;
+                        return (
+                            <div
+                                key={index}
+                                className="has-[[data-state=checked]]:border-primary has-[[data-state=checked]]:bg-primary/5 flex items-center gap-3 rounded-lg border border-input p-3 transition-colors hover:bg-accent"
+                            >
+                                <RadioGroupItem value={option} id={optionId} />
+                                <Label htmlFor={optionId} className="flex-1 cursor-pointer font-mono text-sm font-normal">
+                                    {option}
+                                </Label>
+                            </div>
+                        );
+                    })}
                 </RadioGroup>
             ) : (
                 <>
-                    <Label htmlFor={answerId} className="sr-only">
-                        {isCoding ? 'Your solution' : 'Your answer'}
-                    </Label>
-                    <Textarea
-                        id={answerId}
-                        value={answer}
-                        onChange={(e) => onAnswerChange(e.target.value)}
-                        onKeyDown={isCoding ? handleTabIndent : undefined}
-                        placeholder={isCoding ? 'Write your solution here...' : 'Type your answer...'}
-                        className={isCoding ? 'min-h-64 font-mono text-sm' : undefined}
-                        spellCheck={!isCoding}
-                        autoFocus
-                    />
+                    {isCoding ? (
+                        <CodeEditor
+                            language={question.language ?? 'javascript'}
+                            value={answer}
+                            onChange={onAnswerChange}
+                            placeholder="Write your solution here..."
+                            ariaLabel="Your solution"
+                            autoFocus
+                        />
+                    ) : (
+                        <>
+                            <Label htmlFor={answerId} className="sr-only">
+                                Your answer
+                            </Label>
+                            <Textarea
+                                id={answerId}
+                                value={answer}
+                                onChange={(e) => onAnswerChange(e.target.value)}
+                                placeholder="Type your answer..."
+                                autoFocus
+                            />
+                        </>
+                    )}
                 </>
             )}
             {isCoding && (

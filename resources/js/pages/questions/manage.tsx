@@ -29,7 +29,7 @@ export default function ManageQuestions({ topics, draftQuestions, filters, resul
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Manage questions" />
-            <div className="mx-auto flex w-full max-w-4xl flex-1 flex-col gap-6 p-4">
+            <div className="flex flex-1 flex-col gap-6 p-4">
                 <h1 className="text-xl font-semibold">Manage questions</h1>
 
                 {result && <ResultBanner result={result} />}
@@ -37,11 +37,11 @@ export default function ManageQuestions({ topics, draftQuestions, filters, resul
                 {topics.length === 0 ? (
                     <p className="text-muted-foreground text-sm">Create a topic first before adding questions.</p>
                 ) : (
-                    <>
+                    <div className="grid items-start gap-6 xl:grid-cols-3">
                         <GenerateWizard topics={topics} />
                         <ManualQuestionForm topics={topics} verification={verification} />
                         <ImportQuestionsForm topics={topics} />
-                    </>
+                    </div>
                 )}
 
                 <DraftQuestionsList questions={draftQuestions} topics={topics} filters={filters} />

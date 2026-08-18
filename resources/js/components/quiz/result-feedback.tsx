@@ -1,5 +1,6 @@
 import { TestCaseResults } from '@/components/test-case-results';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { type Attempt, type RevealedQuestion } from '@/types/interview-prep';
 import { CheckCircle2, XCircle } from 'lucide-react';
@@ -7,9 +8,13 @@ import { CheckCircle2, XCircle } from 'lucide-react';
 interface ResultFeedbackProps {
     question: RevealedQuestion;
     attempt: Attempt;
+    onRequestFeedback?: () => void;
+    loadingFeedback?: boolean;
 }
 
-export function ResultFeedback({ question, attempt }: ResultFeedbackProps) {
+export function ResultFeedback({ question, attempt, onRequestFeedback, loadingFeedback }: ResultFeedbackProps) {
+    const canRequestFeedback = question.type === 'mcq' && attempt.feedback === null && !!onRequestFeedback;
+
     return (
         <div className="flex flex-col gap-4">
             <Card>
@@ -24,7 +29,15 @@ export function ResultFeedback({ question, attempt }: ResultFeedbackProps) {
                         <Badge variant="secondary">{attempt.score}/100</Badge>
                     </CardTitle>
                 </CardHeader>
-                <CardContent className="whitespace-pre-wrap text-sm text-muted-foreground">{attempt.feedback}</CardContent>
+                <CardContent className="text-sm text-muted-foreground">
+                    {canRequestFeedback ? (
+                        <Button type="button" variant="outline" size="sm" onClick={onRequestFeedback} disabled={loadingFeedback}>
+                            {loadingFeedback ? 'Getting feedback…' : 'Get AI feedback'}
+                        </Button>
+                    ) : (
+                        <p className="whitespace-pre-wrap">{attempt.feedback}</p>
+                    )}
+                </CardContent>
             </Card>
 
             {attempt.execution_result && (

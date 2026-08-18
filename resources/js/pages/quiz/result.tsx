@@ -1,5 +1,6 @@
 import { ResultFeedback } from '@/components/quiz/result-feedback';
 import { Button } from '@/components/ui/button';
+import { useAttemptFeedback } from '@/hooks/use-attempt-feedback';
 import { buildQuizUrl } from '@/hooks/use-quiz-session';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
@@ -16,6 +17,14 @@ interface QuizResultProps {
 }
 
 export default function QuizResult({ topic, difficulty, type, question, attempt, excludeIds }: QuizResultProps) {
+    const { loadingFeedback, requestFeedback } = useAttemptFeedback({
+        questionId: question.id,
+        attemptId: attempt.id,
+        difficulty,
+        excludeIds,
+        type,
+    });
+
     const breadcrumbs: BreadcrumbItem[] = [
         { title: 'Topics', href: '/topics' },
         { title: topic.name, href: `/topics/${topic.slug}/quiz?difficulty=${difficulty}` },
@@ -26,7 +35,7 @@ export default function QuizResult({ topic, difficulty, type, question, attempt,
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Result" />
             <div className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-4 p-4">
-                <ResultFeedback question={question} attempt={attempt} />
+                <ResultFeedback question={question} attempt={attempt} onRequestFeedback={requestFeedback} loadingFeedback={loadingFeedback} />
                 <Button asChild className="self-start">
                     <Link href={buildQuizUrl(topic.slug, difficulty, excludeIds, type)}>Next question</Link>
                 </Button>

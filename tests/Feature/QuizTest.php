@@ -3,6 +3,7 @@
 use App\Models\Attempt;
 use App\Models\Question;
 use App\Models\Topic;
+use App\Models\User;
 
 it('shows the next approved question with its total count and review status', function () {
     $topic = Topic::create(['name' => 'DSA', 'category' => 'general', 'description' => 'x']);
@@ -22,6 +23,18 @@ it('shows the next approved question with its total count and review status', fu
             ->where('question.review_status', 'new')
             ->where('totalQuestions', 1)
             ->has('executionTimeoutSeconds'));
+});
+
+it('shares the auto-logged-in user on the very first request of a session', function () {
+    // AutoLoginLocalUser only runs once this route group's middleware executes, which is after
+    // the global HandleInertiaRequests middleware. If auth.user were captured eagerly there
+    // instead of lazily, this first, cookie-less request would share a null user.
+    User::factory()->create();
+    $topic = Topic::create(['name' => 'DSA', 'category' => 'general', 'description' => 'x']);
+
+    $this->get("/topics/{$topic->slug}/quiz?difficulty=easy")
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page->has('auth.user.id'));
 });
 
 it('runs a coding submission against test cases without recording an attempt', function () {

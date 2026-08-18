@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\Question;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
@@ -42,9 +43,11 @@ class HandleInertiaRequests extends Middleware
             ...parent::share($request),
             'name' => config('app.name'),
             'quote' => ['message' => trim($message), 'author' => trim($author)],
-            'auth' => [
-                'user' => $request->user(),
-            ],
+            // Lazy: resolved when the response is built, after route middleware (e.g.
+            // AutoLoginLocalUser) has run — not here, while this global middleware executes,
+            // which is before route-specific middleware and would see the pre-login user.
+            'auth' => fn () => ['user' => $request->user()],
+            'draftQuestionCount' => fn () => $request->user() ? Question::where('status', 'draft')->count() : 0,
         ]);
     }
 }

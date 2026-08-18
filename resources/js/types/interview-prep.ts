@@ -44,9 +44,10 @@ export interface TestCaseResult {
 }
 
 export interface Attempt {
+    id: number;
     is_correct: boolean;
     score: number;
-    feedback: string;
+    feedback: string | null;
     execution_result: TestCaseResult[] | null;
 }
 
