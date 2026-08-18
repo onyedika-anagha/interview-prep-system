@@ -1,0 +1,162 @@
+[
+  {
+    "type": "short_answer",
+    "difficulty": "easy",
+    "prompt": "Design a URL shortener (like bit.ly). What are the core components, and how would you generate short codes?",
+    "reference_answer": "Core components: a write path that takes a long URL and stores a mapping to a generated short code, a read path that redirects short codes to the original URL, and a datastore (key-value store or relational table indexed on the code) for lookups. Short codes can be generated via a base62 encoding of an auto-incrementing ID, or a hash of the URL truncated and checked for collisions. Add caching (e.g. Redis) in front of the datastore for hot redirects, and consider read-heavy scaling since redirects vastly outnumber creations.",
+    "language": null,
+    "test_cases": null
+  },
+  {
+    "type": "short_answer",
+    "difficulty": "easy",
+    "prompt": "How would you design a rate limiter for an API?",
+    "reference_answer": "Track request counts per client (by API key or IP) using an algorithm such as fixed window, sliding window log, sliding window counter, or token bucket. Token bucket is common because it allows bursts while enforcing an average rate. Store counters in a fast shared store like Redis with TTL/expiry so the limiter works consistently across multiple API server instances. Return HTTP 429 with a Retry-After header when the limit is exceeded.",
+    "language": null,
+    "test_cases": null
+  },
+  {
+    "type": "short_answer",
+    "difficulty": "easy",
+    "prompt": "Explain how you would design a 'Like' button feature for a social media post at scale.",
+    "reference_answer": "Store likes as rows in a likes table (post_id, user_id, created_at) with a unique constraint on (post_id, user_id) to prevent duplicates. Maintain a denormalized like_count on the post record, updated asynchronously (e.g. via a queue or periodic aggregation) rather than recalculated on every read, since counting rows on every page view doesn't scale. Use caching for hot posts' counts and consider eventual consistency for the displayed count under high write volume.",
+    "language": null,
+    "test_cases": null
+  },
+  {
+    "type": "short_answer",
+    "difficulty": "easy",
+    "prompt": "What is the difference between horizontal and vertical scaling, and when would you choose one over the other?",
+    "reference_answer": "Vertical scaling adds more resources (CPU, RAM) to a single machine; it's simple but has a hard ceiling and a single point of failure. Horizontal scaling adds more machines and distributes load across them; it scales further and improves fault tolerance but adds complexity (load balancing, data partitioning, distributed consistency). Vertical scaling suits simpler systems or early-stage products; horizontal scaling is preferred for systems that need high availability and need to grow beyond what a single machine can handle.",
+    "language": null,
+    "test_cases": null
+  },
+  {
+    "type": "short_answer",
+    "difficulty": "medium",
+    "prompt": "Design a system to handle file uploads for a service like Dropbox. What components are involved?",
+    "reference_answer": "Clients upload files (often in chunks, to support resumability and large files) to an object storage service (e.g. S3) directly via pre-signed URLs, avoiding routing large payloads through the application server. A metadata service tracks file ownership, versioning, folder structure, and sync state in a database. Background workers handle tasks like deduplication (via content hashing), thumbnail generation, and virus scanning. A sync/notification service (e.g. via websockets or long polling) tells other connected clients about changes so they can pull updates.",
+    "language": null,
+    "test_cases": null
+  },
+  {
+    "type": "short_answer",
+    "difficulty": "medium",
+    "prompt": "How would you design a notification system that supports email, SMS, and push notifications?",
+    "reference_answer": "Use a producer/consumer architecture: application events publish notification requests to a queue, and separate worker services consume from the queue per channel (email worker, SMS worker, push worker), each integrating with a third-party provider (e.g. SES, Twilio, FCM/APNs). Store user notification preferences and channel addresses in a user profile service, and track delivery status/retries per notification. Use idempotency keys to avoid duplicate sends and rate limits per user to avoid spamming.",
+    "language": null,
+    "test_cases": null
+  },
+  {
+    "type": "short_answer",
+    "difficulty": "medium",
+    "prompt": "Design a simple key-value caching layer for a web application. What eviction policy would you use and why?",
+    "reference_answer": "Sit an in-memory cache (e.g. Redis or Memcached) in front of the primary database, using a cache-aside pattern: read from cache first, fall back to the database on a miss and populate the cache, and invalidate/update the cache on writes. LRU (Least Recently Used) is a common default eviction policy since it approximates keeping the most likely-to-be-reused data; LFU may suit workloads with strong popularity skew. Set TTLs to bound staleness and avoid unbounded growth.",
+    "language": null,
+    "test_cases": null
+  },
+  {
+    "type": "short_answer",
+    "difficulty": "medium",
+    "prompt": "How would you design the backend for a real-time chat application?",
+    "reference_answer": "Use persistent WebSocket (or long-polling fallback) connections between clients and a fleet of connection-handling servers, with a pub/sub layer (e.g. Redis pub/sub or a message broker) so a message sent to one server's connection can be routed to the recipient's connection on another server. Persist messages to a database for history/offline delivery, and use a presence service to track online/offline status. Partition conversations to distribute load and consider read receipts/typing indicators as separate lightweight event streams.",
+    "language": null,
+    "test_cases": null
+  },
+  {
+    "type": "short_answer",
+    "difficulty": "medium",
+    "prompt": "Design a system for a news feed (like Twitter/Facebook) that shows recent posts from people a user follows.",
+    "reference_answer": "Two common approaches: fan-out on write (when a user posts, push the post into each follower's precomputed feed, fast reads but expensive for users with huge follower counts) and fan-out on read (compute the feed at request time by merging posts from followed users, simpler writes but slower reads). Most large systems use a hybrid: fan-out on write for typical users, fan-out on read (or special handling) for celebrities with millions of followers. Store feeds in a fast store like Redis lists, and use pagination/cursor-based fetching for scrolling.",
+    "language": null,
+    "test_cases": null
+  },
+  {
+    "type": "short_answer",
+    "difficulty": "medium",
+    "prompt": "How would you design a distributed job queue system?",
+    "reference_answer": "Producers push jobs onto a durable queue (e.g. SQS, RabbitMQ, or a Redis-backed queue) with metadata like priority and retry count. Worker processes pull jobs, process them, and acknowledge completion; unacknowledged jobs are redelivered after a visibility timeout to handle worker crashes. Support retries with exponential backoff and a dead-letter queue for jobs that repeatedly fail. Scale by adding more workers, and use idempotent job handlers since at-least-once delivery is typical.",
+    "language": null,
+    "test_cases": null
+  },
+  {
+    "type": "short_answer",
+    "difficulty": "medium",
+    "prompt": "Explain how you'd design an autocomplete/typeahead search feature for a search bar handling millions of queries.",
+    "reference_answer": "Precompute and index common query prefixes using a trie or a search index (e.g. Elasticsearch) that supports fast prefix lookups, ranked by historical popularity/frequency. Serve suggestions from an in-memory cache for the hottest prefixes to keep latency low (sub-100ms). Update the ranking data asynchronously from query logs (batch or streaming aggregation) rather than in the request path. Debounce client-side requests to avoid hitting the backend on every keystroke.",
+    "language": null,
+    "test_cases": null
+  },
+  {
+    "type": "short_answer",
+    "difficulty": "medium",
+    "prompt": "Design a system to track and display live view counts on a video streaming platform.",
+    "reference_answer": "Ingest view/heartbeat events from clients into a stream processing pipeline (e.g. Kafka + a stream processor) that aggregates counts per video in near real time rather than writing directly to a relational database per event. Store rolling aggregate counts in a fast store (Redis) that the video page reads from, and periodically flush aggregates to durable storage for historical analytics. Use approximate counting (e.g. HyperLogLog) if exact uniqueness isn't required, to save memory at scale.",
+    "language": null,
+    "test_cases": null
+  },
+  {
+    "type": "short_answer",
+    "difficulty": "hard",
+    "prompt": "Design a globally distributed database for a social media application. How do you handle consistency vs. availability trade-offs?",
+    "reference_answer": "Partition (shard) data by a key like user_id and replicate each partition across regions for locality and fault tolerance. Per the CAP theorem, under a network partition you must choose consistency or availability; most social feed data tolerates eventual consistency (favoring availability) since a slightly stale feed is acceptable, while account/auth data may need stronger consistency. Use techniques like leader-based replication with async replication to secondary regions, conflict resolution (e.g. last-write-wins or CRDTs) for multi-region writes, and read-your-writes consistency for the acting user via sticky routing or session tokens.",
+    "language": null,
+    "test_cases": null
+  },
+  {
+    "type": "short_answer",
+    "difficulty": "hard",
+    "prompt": "How would you design a system like Uber that matches riders with nearby drivers in real time?",
+    "reference_answer": "Drivers periodically report location via a lightweight ping to a location service, which stores positions in a geospatial index (e.g. geohashing or a quadtree) partitioned by region for fast proximity queries. When a rider requests a ride, query the index for nearby available drivers, rank by ETA/distance, and dispatch via a matching service that handles offers, timeouts, and reassignment if a driver declines. Use a state machine per trip (requested, matched, en route, in progress, completed) persisted in a database, and push real-time updates to both parties over WebSockets/push notifications.",
+    "language": null,
+    "test_cases": null
+  },
+  {
+    "type": "short_answer",
+    "difficulty": "hard",
+    "prompt": "Design a payment processing system that must guarantee exactly-once processing of transactions.",
+    "reference_answer": "True exactly-once delivery across a network isn't achievable, so instead design for at-least-once delivery with idempotent processing: require clients to send a unique idempotency key per transaction attempt, and store processed keys with their result so retries return the original outcome instead of double-charging. Use a database transaction (or a state machine with a status column: pending, processing, completed, failed) to atomically move funds and record the idempotency key together. Reconcile with the payment provider via webhooks and periodic settlement checks to catch any divergence.",
+    "language": null,
+    "test_cases": null
+  },
+  {
+    "type": "short_answer",
+    "difficulty": "hard",
+    "prompt": "How would you design a rate-limited, multi-tenant API gateway that serves thousands of clients with different SLAs?",
+    "reference_answer": "Place an API gateway layer in front of backend services that authenticates each request, identifies the tenant, and applies per-tenant rate limits (e.g. token bucket counters in a shared Redis cluster) based on that tenant's SLA tier. Use request queuing/shedding to protect backends when limits are exceeded, and route higher-tier tenants to dedicated capacity if needed for isolation. Centralize logging/metrics per tenant for billing and abuse detection, and make the gateway itself horizontally scalable and stateless (with rate-limit state externalized) so it isn't a single point of failure.",
+    "language": null,
+    "test_cases": null
+  },
+  {
+    "type": "short_answer",
+    "difficulty": "hard",
+    "prompt": "Design a search engine's indexing pipeline for crawling and indexing billions of web pages.",
+    "reference_answer": "A distributed crawler fetches pages, respecting robots.txt and rate limits per domain, and pushes raw content to storage/queues. A processing pipeline parses HTML, extracts text and links, deduplicates near-identical content, and computes ranking signals (e.g. link graph analysis like PageRank). An indexer builds an inverted index (term -> list of documents) sharded across many machines, since a single machine can't hold or serve billions of documents. Queries are distributed to the relevant shards, results merged and ranked, with the whole pipeline updated incrementally rather than fully rebuilt to keep the index fresh.",
+    "language": null,
+    "test_cases": null
+  },
+  {
+    "type": "short_answer",
+    "difficulty": "hard",
+    "prompt": "How would you design a system to detect and prevent duplicate/fraudulent transactions in real time?",
+    "reference_answer": "Run each transaction through a real-time scoring pipeline that checks idempotency keys (to catch exact duplicates), velocity rules (e.g. too many transactions from one account/card in a short window), and a fraud model (rules-based and/or ML) using features like device fingerprint, location anomalies, and historical behavior. Flagged transactions can be held for manual review, step-up authentication, or auto-declined depending on risk score. Stream transaction events through a system like Kafka into both the real-time scorer and an offline pipeline that retrains fraud models on labeled outcomes.",
+    "language": null,
+    "test_cases": null
+  },
+  {
+    "type": "short_answer",
+    "difficulty": "hard",
+    "prompt": "Design a scalable logging and monitoring system for a microservices architecture with hundreds of services.",
+    "reference_answer": "Each service emits structured logs and metrics, tagged with a trace/request ID for correlation across service boundaries (distributed tracing, e.g. OpenTelemetry). Logs are shipped asynchronously (via agents/sidecars) to a centralized pipeline (e.g. Kafka) that fans out to a log store (e.g. Elasticsearch) for search and a metrics store (e.g. Prometheus/time-series DB) for dashboards and alerting. Use sampling for high-volume trace data to control cost, define SLO-based alerts rather than alerting on every anomaly, and retain raw logs for a limited window with longer-term aggregated metrics for trend analysis.",
+    "language": null,
+    "test_cases": null
+  },
+  {
+    "type": "short_answer",
+    "difficulty": "hard",
+    "prompt": "How would you design a video streaming service like YouTube, focusing on video upload, transcoding, and delivery via CDN?",
+    "reference_answer": "Uploads go to object storage (often via chunked/resumable upload), triggering an asynchronous transcoding pipeline that converts the source video into multiple resolutions/bitrates (for adaptive bitrate streaming, e.g. HLS/DASH) using a fleet of transcoding workers, often GPU-accelerated. Transcoded segments and metadata are stored in object storage and a metadata database, then distributed to a CDN so playback requests are served from edge locations close to viewers rather than the origin. The player selects bitrate dynamically based on the viewer's bandwidth, and view/engagement events are streamed to an analytics pipeline separately from the playback path.",
+    "language": null,
+    "test_cases": null
+  }
+]

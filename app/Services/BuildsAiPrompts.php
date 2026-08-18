@@ -19,8 +19,9 @@ trait BuildsAiPrompts
         Return ONLY a JSON array (no prose, no markdown fences). Each element must have:
         - "type": one of "mcq", "short_answer", "coding"
         - "difficulty": string, echoing "{$difficulty}"
-        - "prompt": the question text (for mcq, include the options inline)
-        - "reference_answer": the correct answer or solution
+        - "prompt": the question text (for mcq, do NOT include the options in this text — they go in "options")
+        - "reference_answer": the correct answer or solution (for mcq, this must exactly match one of the strings in "options")
+        - "options": for "mcq" questions only, an array of 3-5 answer choice strings; null for other types
         - "language": for "coding" questions only, either "javascript" or "php"; null for other types
         - "test_cases": for "coding" questions only, an array of {"input": ..., "expected_output": ...} objects; null for other types
 

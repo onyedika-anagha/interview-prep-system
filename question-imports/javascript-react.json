@@ -1,0 +1,188 @@
+[
+  {
+    "type": "mcq",
+    "difficulty": "easy",
+    "prompt": "What does `typeof null` return in JavaScript?",
+    "reference_answer": "\"object\"",
+    "options": ["\"null\"", "\"undefined\"", "\"object\"", "\"number\""],
+    "language": null,
+    "test_cases": null
+  },
+  {
+    "type": "mcq",
+    "difficulty": "easy",
+    "prompt": "Which React hook is used to perform side effects (e.g. data fetching, subscriptions) in a function component?",
+    "reference_answer": "useEffect",
+    "options": ["useState", "useEffect", "useMemo", "useRef"],
+    "language": null,
+    "test_cases": null
+  },
+  {
+    "type": "mcq",
+    "difficulty": "easy",
+    "prompt": "What is the output of `console.log(1 + '1')` in JavaScript?",
+    "reference_answer": "\"11\"",
+    "options": ["2", "\"11\"", "NaN", "Error"],
+    "language": null,
+    "test_cases": null
+  },
+  {
+    "type": "mcq",
+    "difficulty": "medium",
+    "prompt": "In React, what is the purpose of the `key` prop when rendering a list of elements?",
+    "reference_answer": "It helps React identify which items changed, were added, or removed for efficient re-rendering",
+    "options": [
+      "It sets the CSS class of each item",
+      "It helps React identify which items changed, were added, or removed for efficient re-rendering",
+      "It sets the tab order for accessibility",
+      "It is required for event handlers to work"
+    ],
+    "language": null,
+    "test_cases": null
+  },
+  {
+    "type": "mcq",
+    "difficulty": "medium",
+    "prompt": "What does the `this` keyword refer to inside a JavaScript arrow function?",
+    "reference_answer": "It is lexically bound to the enclosing scope (arrow functions have no own `this`)",
+    "options": [
+      "The object that called the function",
+      "The global object, always",
+      "It is lexically bound to the enclosing scope (arrow functions have no own `this`)",
+      "undefined, always"
+    ],
+    "language": null,
+    "test_cases": null
+  },
+  {
+    "type": "mcq",
+    "difficulty": "medium",
+    "prompt": "Which statement about React's `useState` is correct?",
+    "reference_answer": "State updates may be batched and are asynchronous from the caller's perspective",
+    "options": [
+      "State updates are always applied synchronously",
+      "Calling the setter automatically merges the new value into an existing object state",
+      "State updates may be batched and are asynchronous from the caller's perspective",
+      "useState can only be called once per component"
+    ],
+    "language": null,
+    "test_cases": null
+  },
+  {
+    "type": "mcq",
+    "difficulty": "medium",
+    "prompt": "What is a closure in JavaScript?",
+    "reference_answer": "A function bundled together with references to its surrounding lexical scope",
+    "options": [
+      "A function that has no parameters",
+      "A function bundled together with references to its surrounding lexical scope",
+      "A method that closes a database connection",
+      "A block of code wrapped in curly braces"
+    ],
+    "language": null,
+    "test_cases": null
+  },
+  {
+    "type": "mcq",
+    "difficulty": "hard",
+    "prompt": "What is the main difference between `useMemo` and `useCallback` in React?",
+    "reference_answer": "useMemo memoizes a computed value; useCallback memoizes a function reference",
+    "options": [
+      "useMemo memoizes a computed value; useCallback memoizes a function reference",
+      "They are functionally identical",
+      "useCallback only works in class components",
+      "useMemo is deprecated in favor of useCallback"
+    ],
+    "language": null,
+    "test_cases": null
+  },
+  {
+    "type": "mcq",
+    "difficulty": "hard",
+    "prompt": "In the JavaScript event loop, in what order do a synchronous script, a `setTimeout(fn, 0)` callback, and a resolved `Promise.then()` callback run?",
+    "reference_answer": "Sync script, Promise (microtask), setTimeout (macrotask)",
+    "options": [
+      "setTimeout, Promise, sync script",
+      "Sync script, Promise (microtask), setTimeout (macrotask)",
+      "Promise, sync script, setTimeout",
+      "They always run in source order regardless of type"
+    ],
+    "language": null,
+    "test_cases": null
+  },
+  {
+    "type": "mcq",
+    "difficulty": "hard",
+    "prompt": "What problem does React's Virtual DOM diffing algorithm primarily solve?",
+    "reference_answer": "It minimizes expensive direct DOM manipulations by computing the minimal set of changes needed",
+    "options": [
+      "It eliminates the need for a real DOM entirely",
+      "It minimizes expensive direct DOM manipulations by computing the minimal set of changes needed",
+      "It replaces JavaScript's garbage collector",
+      "It enables server-side rendering only"
+    ],
+    "language": null,
+    "test_cases": null
+  },
+  {
+    "type": "coding",
+    "difficulty": "easy",
+    "prompt": "Write a function `sumArray(arr)` that returns the sum of all numbers in the array `arr`.",
+    "reference_answer": "const input = JSON.parse(require('fs').readFileSync(0, 'utf8'));\nfunction sumArray(arr) {\n  return arr.reduce((total, n) => total + n, 0);\n}\nconsole.log(JSON.stringify(sumArray(input.arr)));",
+    "language": "javascript",
+    "test_cases": [
+      { "input": { "arr": [1, 2, 3, 4, 5] }, "expected_output": 15 },
+      { "input": { "arr": [] }, "expected_output": 0 },
+      { "input": { "arr": [-1, 1, 10] }, "expected_output": 10 }
+    ]
+  },
+  {
+    "type": "coding",
+    "difficulty": "easy",
+    "prompt": "Write a function `isPalindrome(str)` that returns `true` if the string reads the same forwards and backwards (case-insensitive), and `false` otherwise.",
+    "reference_answer": "const input = JSON.parse(require('fs').readFileSync(0, 'utf8'));\nfunction isPalindrome(str) {\n  const lower = str.toLowerCase();\n  return lower === lower.split('').reverse().join('');\n}\nconsole.log(JSON.stringify(isPalindrome(input.str)));",
+    "language": "javascript",
+    "test_cases": [
+      { "input": { "str": "Racecar" }, "expected_output": true },
+      { "input": { "str": "hello" }, "expected_output": false },
+      { "input": { "str": "level" }, "expected_output": true }
+    ]
+  },
+  {
+    "type": "coding",
+    "difficulty": "medium",
+    "prompt": "Write a function `flattenArray(arr)` that flattens a nested array of arbitrary depth into a single-level array, preserving order.",
+    "reference_answer": "const input = JSON.parse(require('fs').readFileSync(0, 'utf8'));\nfunction flattenArray(arr) {\n  return arr.reduce((flat, item) => flat.concat(Array.isArray(item) ? flattenArray(item) : item), []);\n}\nconsole.log(JSON.stringify(flattenArray(input.arr)));",
+    "language": "javascript",
+    "test_cases": [
+      { "input": { "arr": [1, [2, 3], [4, [5, 6]]] }, "expected_output": [1, 2, 3, 4, 5, 6] },
+      { "input": { "arr": [[1], [2], [3]] }, "expected_output": [1, 2, 3] },
+      { "input": { "arr": [] }, "expected_output": [] }
+    ]
+  },
+  {
+    "type": "coding",
+    "difficulty": "medium",
+    "prompt": "Write a function `countVowels(str)` that returns the number of vowels (a, e, i, o, u, case-insensitive) in the string.",
+    "reference_answer": "const input = JSON.parse(require('fs').readFileSync(0, 'utf8'));\nfunction countVowels(str) {\n  const matches = str.match(/[aeiouAEIOU]/g);\n  return matches ? matches.length : 0;\n}\nconsole.log(JSON.stringify(countVowels(input.str)));",
+    "language": "javascript",
+    "test_cases": [
+      { "input": { "str": "Hello World" }, "expected_output": 3 },
+      { "input": { "str": "xyz" }, "expected_output": 0 },
+      { "input": { "str": "AEIOU" }, "expected_output": 5 }
+    ]
+  },
+  {
+    "type": "coding",
+    "difficulty": "hard",
+    "prompt": "Write a function `fibonacci(n)` that returns the nth Fibonacci number (0-indexed: fibonacci(0) = 0, fibonacci(1) = 1). Use an approach that avoids the exponential blowup of naive recursion (e.g. iteration or memoization).",
+    "reference_answer": "const input = JSON.parse(require('fs').readFileSync(0, 'utf8'));\nfunction fibonacci(n) {\n  if (n < 2) return n;\n  let a = 0, b = 1;\n  for (let i = 2; i <= n; i++) {\n    [a, b] = [b, a + b];\n  }\n  return b;\n}\nconsole.log(JSON.stringify(fibonacci(input.n)));",
+    "language": "javascript",
+    "test_cases": [
+      { "input": { "n": 10 }, "expected_output": 55 },
+      { "input": { "n": 0 }, "expected_output": 0 },
+      { "input": { "n": 1 }, "expected_output": 1 },
+      { "input": { "n": 20 }, "expected_output": 6765 }
+    ]
+  }
+]

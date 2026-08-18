@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useGenerateWizard } from '@/hooks/use-generate-wizard';
+import { difficultyLabel } from '@/lib/question-labels';
 import { type Topic } from '@/types/interview-prep';
 
 export function GenerateWizard({ topics }: { topics: Topic[] }) {
@@ -49,7 +50,7 @@ export function GenerateWizard({ topics }: { topics: Topic[] }) {
                                     <SelectContent>
                                         {DIFFICULTIES.map((level) => (
                                             <SelectItem key={level} value={level}>
-                                                {level}
+                                                {difficultyLabel(level)}
                                             </SelectItem>
                                         ))}
                                     </SelectContent>

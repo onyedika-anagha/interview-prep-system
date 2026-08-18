@@ -10,7 +10,7 @@ use InvalidArgumentException;
 
 class CodeExecutionService
 {
-    private const DEFAULT_TIMEOUT_SECONDS = 5;
+    public const DEFAULT_TIMEOUT_SECONDS = 5;
 
     private const EXTENSIONS = [
         'javascript' => 'js',

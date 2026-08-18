@@ -17,6 +17,7 @@ class Question extends Model
         'difficulty',
         'prompt',
         'reference_answer',
+        'options',
         'language',
         'test_cases',
         'status',
@@ -28,6 +29,7 @@ class Question extends Model
     protected function casts(): array
     {
         return [
+            'options' => 'array',
             'test_cases' => 'array',
             'review_due_at' => 'datetime',
         ];
@@ -56,6 +58,8 @@ class Question extends Model
             'difficulty' => 'required|string',
             'prompt' => 'required|string',
             'reference_answer' => 'required|string',
+            'options' => 'nullable|array',
+            'options.*' => 'string',
             'language' => 'nullable|in:javascript,php',
             'test_cases' => 'nullable|array',
         ];

@@ -1,0 +1,188 @@
+[
+  {
+    "type": "mcq",
+    "difficulty": "easy",
+    "prompt": "In PHP, what does the `===` operator check that `==` does not?",
+    "reference_answer": "Type in addition to value",
+    "options": ["Nothing, they are identical", "Type in addition to value", "Only type, not value", "Reference equality only"],
+    "language": null,
+    "test_cases": null
+  },
+  {
+    "type": "mcq",
+    "difficulty": "easy",
+    "prompt": "Which Artisan command creates a new Eloquent model class?",
+    "reference_answer": "php artisan make:model",
+    "options": ["php artisan make:model", "php artisan create:model", "php artisan new:model", "php artisan generate:model"],
+    "language": null,
+    "test_cases": null
+  },
+  {
+    "type": "mcq",
+    "difficulty": "easy",
+    "prompt": "What does Laravel's `dd()` helper function do?",
+    "reference_answer": "Dumps variables and stops script execution",
+    "options": [
+      "Deletes data from the database",
+      "Dumps variables and stops script execution",
+      "Defines a default config value",
+      "Dispatches a queued job"
+    ],
+    "language": null,
+    "test_cases": null
+  },
+  {
+    "type": "mcq",
+    "difficulty": "medium",
+    "prompt": "In Eloquent, what is the purpose of the `$fillable` property on a model?",
+    "reference_answer": "It whitelists attributes that are mass-assignable",
+    "options": [
+      "It lists columns that can never be updated",
+      "It whitelists attributes that are mass-assignable",
+      "It hides attributes from JSON serialization",
+      "It defines database indexes"
+    ],
+    "language": null,
+    "test_cases": null
+  },
+  {
+    "type": "mcq",
+    "difficulty": "medium",
+    "prompt": "Which Eloquent relationship method would you use on a `Post` model that belongs to exactly one `User`?",
+    "reference_answer": "belongsTo",
+    "options": ["hasMany", "belongsToMany", "belongsTo", "hasOne"],
+    "language": null,
+    "test_cases": null
+  },
+  {
+    "type": "mcq",
+    "difficulty": "medium",
+    "prompt": "What is a Laravel Service Provider primarily used for?",
+    "reference_answer": "Registering bindings in the service container and bootstrapping application services",
+    "options": [
+      "Serving static files",
+      "Registering bindings in the service container and bootstrapping application services",
+      "Handling HTTP routing exclusively",
+      "Managing database migrations"
+    ],
+    "language": null,
+    "test_cases": null
+  },
+  {
+    "type": "mcq",
+    "difficulty": "medium",
+    "prompt": "What does the PHP `??` (null coalescing) operator do?",
+    "reference_answer": "Returns the left operand if it is not null, otherwise the right operand",
+    "options": [
+      "Returns the left operand if it is not null, otherwise the right operand",
+      "Compares two values for equality",
+      "Casts a variable to null",
+      "Throws an exception if a value is null"
+    ],
+    "language": null,
+    "test_cases": null
+  },
+  {
+    "type": "mcq",
+    "difficulty": "hard",
+    "prompt": "What is the N+1 query problem, and which Eloquent feature helps prevent it?",
+    "reference_answer": "Executing one extra query per related record inside a loop, fixed with eager loading via with()",
+    "options": [
+      "It's a caching bug, fixed with Cache::remember",
+      "Executing one extra query per related record inside a loop, fixed with eager loading via with()",
+      "A migration ordering issue, fixed with php artisan migrate:fresh",
+      "A route conflict, fixed with route caching"
+    ],
+    "language": null,
+    "test_cases": null
+  },
+  {
+    "type": "mcq",
+    "difficulty": "hard",
+    "prompt": "What does the `php artisan queue:work` command do?",
+    "reference_answer": "Processes queued jobs from the configured queue connection",
+    "options": [
+      "Starts the built-in development server",
+      "Processes queued jobs from the configured queue connection",
+      "Compiles frontend assets",
+      "Runs pending database migrations"
+    ],
+    "language": null,
+    "test_cases": null
+  },
+  {
+    "type": "mcq",
+    "difficulty": "hard",
+    "prompt": "In PHP, what is the key difference between an interface and an abstract class?",
+    "reference_answer": "A class can implement multiple interfaces but extend only one abstract class",
+    "options": [
+      "Interfaces can have method implementations; abstract classes cannot",
+      "A class can implement multiple interfaces but extend only one abstract class",
+      "Abstract classes cannot have constructors",
+      "There is no meaningful difference"
+    ],
+    "language": null,
+    "test_cases": null
+  },
+  {
+    "type": "coding",
+    "difficulty": "easy",
+    "prompt": "Write a function `sumArray($arr)` that returns the sum of all numbers in the array `$arr`.",
+    "reference_answer": "<?php\n$input = json_decode(file_get_contents('php://stdin'), true);\nfunction sumArray($arr) {\n    return array_sum($arr);\n}\necho json_encode(sumArray($input['arr']));",
+    "language": "php",
+    "test_cases": [
+      { "input": { "arr": [1, 2, 3, 4, 5] }, "expected_output": 15 },
+      { "input": { "arr": [] }, "expected_output": 0 },
+      { "input": { "arr": [-5, 5, 10] }, "expected_output": 10 }
+    ]
+  },
+  {
+    "type": "coding",
+    "difficulty": "easy",
+    "prompt": "Write a function `isPalindrome($str)` that returns `true` if the string reads the same forwards and backwards (case-insensitive), `false` otherwise.",
+    "reference_answer": "<?php\n$input = json_decode(file_get_contents('php://stdin'), true);\nfunction isPalindrome($str) {\n    $clean = strtolower($str);\n    return $clean === strrev($clean);\n}\necho json_encode(isPalindrome($input['str']));",
+    "language": "php",
+    "test_cases": [
+      { "input": { "str": "Racecar" }, "expected_output": true },
+      { "input": { "str": "hello" }, "expected_output": false },
+      { "input": { "str": "level" }, "expected_output": true }
+    ]
+  },
+  {
+    "type": "coding",
+    "difficulty": "medium",
+    "prompt": "Write a function `countVowels($str)` that returns the number of vowels (a, e, i, o, u, case-insensitive) in `$str`.",
+    "reference_answer": "<?php\n$input = json_decode(file_get_contents('php://stdin'), true);\nfunction countVowels($str) {\n    preg_match_all('/[aeiouAEIOU]/', $str, $matches);\n    return count($matches[0]);\n}\necho json_encode(countVowels($input['str']));",
+    "language": "php",
+    "test_cases": [
+      { "input": { "str": "Hello World" }, "expected_output": 3 },
+      { "input": { "str": "xyz" }, "expected_output": 0 },
+      { "input": { "str": "AEIOU" }, "expected_output": 5 }
+    ]
+  },
+  {
+    "type": "coding",
+    "difficulty": "medium",
+    "prompt": "Write a function `uniqueValues($arr)` that returns the array with duplicate values removed, preserving the order of first appearance.",
+    "reference_answer": "<?php\n$input = json_decode(file_get_contents('php://stdin'), true);\nfunction uniqueValues($arr) {\n    return array_values(array_unique($arr));\n}\necho json_encode(uniqueValues($input['arr']));",
+    "language": "php",
+    "test_cases": [
+      { "input": { "arr": [1, 2, 2, 3, 1, 4] }, "expected_output": [1, 2, 3, 4] },
+      { "input": { "arr": [5, 5, 5] }, "expected_output": [5] },
+      { "input": { "arr": [] }, "expected_output": [] }
+    ]
+  },
+  {
+    "type": "coding",
+    "difficulty": "hard",
+    "prompt": "Write a function `fibonacci($n)` that returns the nth Fibonacci number (0-indexed: fibonacci(0) = 0, fibonacci(1) = 1) using an iterative approach.",
+    "reference_answer": "<?php\n$input = json_decode(file_get_contents('php://stdin'), true);\nfunction fibonacci($n) {\n    if ($n < 2) return $n;\n    $a = 0; $b = 1;\n    for ($i = 2; $i <= $n; $i++) {\n        [$a, $b] = [$b, $a + $b];\n    }\n    return $b;\n}\necho json_encode(fibonacci($input['n']));",
+    "language": "php",
+    "test_cases": [
+      { "input": { "n": 10 }, "expected_output": 55 },
+      { "input": { "n": 0 }, "expected_output": 0 },
+      { "input": { "n": 1 }, "expected_output": 1 },
+      { "input": { "n": 20 }, "expected_output": 6765 }
+    ]
+  }
+]

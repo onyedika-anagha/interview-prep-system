@@ -10,12 +10,22 @@ export interface Topic {
     description?: string | null;
 }
 
+export type ReviewStatus = 'new' | 'due' | 'scheduled';
+
+export interface SampleTestCase {
+    input: unknown;
+    expected_output: unknown;
+}
+
 export interface QuizQuestion {
     id: number;
     type: QuestionType;
     difficulty: string;
     prompt: string;
+    options?: string[] | null;
     language?: 'javascript' | 'php' | null;
+    test_cases?: SampleTestCase[] | null;
+    review_status?: ReviewStatus;
 }
 
 export interface RevealedQuestion {
@@ -55,6 +65,10 @@ export interface DraftQuestion {
     type: QuestionType;
     difficulty: string;
     prompt: string;
+    reference_answer: string;
+    options?: string[] | null;
+    language?: 'javascript' | 'php' | null;
+    test_cases?: SampleTestCase[] | null;
     generated_by: string;
     created_at: string;
     topic: { id: number; name: string };
@@ -64,4 +78,17 @@ export interface QuestionActionResult {
     type: 'generated' | 'added' | 'imported';
     created: number;
     errors: string[];
+}
+
+export interface Paginated<T> {
+    data: T[];
+    current_page: number;
+    last_page: number;
+    total: number;
+}
+
+export interface DraftQuestionFilters {
+    topic_id?: string;
+    type?: string;
+    difficulty?: string;
 }

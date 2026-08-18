@@ -39,6 +39,10 @@ return [
         'provider' => env('AI_PROVIDER', 'claude'),
     ],
 
+    'claude' => [
+        'cli_path' => env('CLAUDE_CLI_PATH', 'claude'),
+    ],
+
     'gemini' => [
         'api_key' => env('GEMINI_API_KEY'),
         'model' => env('GEMINI_MODEL', 'gemini-2.0-flash'),

@@ -1,8 +1,7 @@
+import { DIFFICULTIES } from '@/lib/question-labels';
 import { type Topic } from '@/types/interview-prep';
 import { useForm } from '@inertiajs/react';
 import { useState } from 'react';
-
-const DIFFICULTIES = ['easy', 'medium', 'hard'];
 
 /**
  * Two-step wizard: pick a topic, then difficulty + count. Kept as a hook so

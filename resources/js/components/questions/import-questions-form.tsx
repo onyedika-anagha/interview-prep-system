@@ -19,7 +19,12 @@ export function ImportQuestionsForm({ topics }: { topics: Topic[] }) {
                 <CardContent className="flex flex-col gap-4">
                     <p className="text-muted-foreground text-sm">
                         A JSON array of questions for one topic:{' '}
-                        <code>{'{ type, difficulty, prompt, reference_answer, language?, test_cases? }'}</code>
+                        <code>{'{ type, difficulty, prompt, reference_answer, options?, language?, test_cases? }'}</code>{' '}
+                        —{' '}
+                        <a href="/templates/questions-template.json" download className="underline underline-offset-2">
+                            download an example file
+                        </a>
+                        .
                     </p>
                     <div className="grid gap-2">
                         <Label>Topic</Label>

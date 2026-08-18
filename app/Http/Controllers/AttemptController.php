@@ -18,6 +18,7 @@ class AttemptController extends Controller
             'answer' => 'required|string',
             'difficulty' => 'required|string',
             'exclude' => 'nullable|string',
+            'type' => 'nullable|in:mcq,short_answer,coding',
         ]);
 
         if ($question->type === 'coding') {
@@ -51,6 +52,7 @@ class AttemptController extends Controller
         return Inertia::render('quiz/result', [
             'topic' => $question->topic->only(['id', 'name', 'slug']),
             'difficulty' => $validated['difficulty'],
+            'type' => $validated['type'] ?? null,
             'question' => $question->only(['id', 'type', 'prompt', 'reference_answer']),
             'attempt' => $attempt->only(['is_correct', 'score', 'feedback', 'execution_result']),
             'excludeIds' => $excludeIds,

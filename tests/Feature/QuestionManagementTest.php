@@ -17,7 +17,8 @@ it('renders the manage page with topics and draft questions', function () {
         ->assertInertia(fn ($page) => $page
             ->component('questions/manage')
             ->has('topics', 1)
-            ->has('draftQuestions', 1));
+            ->has('draftQuestions.data', 1)
+            ->where('draftQuestions.total', 1));
 });
 
 it('generates draft questions for a topic via the configured AI provider', function () {
@@ -94,6 +95,27 @@ it('rejects an import file that is not a JSON array', function () {
     expect(Question::where('topic_id', $topic->id)->count())->toBe(0);
 });
 
+it('verifies a reference answer against its test cases before saving', function () {
+    $php = <<<'PHP'
+        <?php
+        $data = json_decode(file_get_contents('php://stdin'), true);
+        echo json_encode($data['a'] + $data['b']);
+        PHP;
+
+    $this->post('/questions/verify', [
+        'language' => 'php',
+        'reference_answer' => $php,
+        'test_cases' => [
+            ['input' => ['a' => 2, 'b' => 3], 'expected_output' => 5],
+            ['input' => ['a' => 1, 'b' => 1], 'expected_output' => 3],
+        ],
+    ])
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page
+            ->where('verification.0.passed', true)
+            ->where('verification.1.passed', false));
+});
+
 it('approves and rejects draft questions', function () {
     $topic = Topic::create(['name' => 'DSA', 'category' => 'general', 'description' => 'x']);
     $question = $topic->questions()->create([
@@ -106,4 +128,60 @@ it('approves and rejects draft questions', function () {
 
     $this->delete("/questions/{$question->id}")->assertOk();
     expect(Question::find($question->id))->toBeNull();
+});
+
+it('edits a draft question', function () {
+    $topic = Topic::create(['name' => 'DSA', 'category' => 'general', 'description' => 'x']);
+    $question = $topic->questions()->create([
+        'type' => 'short_answer', 'difficulty' => 'easy', 'prompt' => 'typo here',
+        'reference_answer' => 'y', 'status' => 'draft', 'generated_by' => 'manual',
+    ]);
+
+    $this->patch("/questions/{$question->id}", [
+        'type' => 'short_answer',
+        'difficulty' => 'medium',
+        'prompt' => 'fixed prompt',
+        'reference_answer' => 'y',
+    ])->assertOk();
+
+    expect($question->fresh())
+        ->prompt->toBe('fixed prompt')
+        ->difficulty->toBe('medium')
+        ->status->toBe('draft');
+});
+
+it('bulk approves and bulk rejects draft questions', function () {
+    $topic = Topic::create(['name' => 'DSA', 'category' => 'general', 'description' => 'x']);
+    $questions = collect(range(1, 3))->map(fn ($i) => $topic->questions()->create([
+        'type' => 'short_answer', 'difficulty' => 'easy', 'prompt' => "q{$i}",
+        'reference_answer' => 'y', 'status' => 'draft', 'generated_by' => 'manual',
+    ]));
+
+    $this->patch('/questions/bulk/approve', ['ids' => $questions->take(2)->pluck('id')->all()])->assertOk();
+    expect(Question::where('status', 'approved')->count())->toBe(2);
+
+    $this->delete('/questions/bulk', ['ids' => [$questions->last()->id]])->assertOk();
+    expect(Question::count())->toBe(2);
+});
+
+it('filters the draft list by topic, type, and difficulty', function () {
+    $dsa = Topic::create(['name' => 'DSA', 'category' => 'general', 'description' => 'x']);
+    $php = Topic::create(['name' => 'PHP', 'category' => 'stack', 'description' => 'x']);
+
+    $dsa->questions()->create([
+        'type' => 'mcq', 'difficulty' => 'easy', 'prompt' => 'a',
+        'reference_answer' => 'y', 'options' => ['y', 'n'], 'status' => 'draft', 'generated_by' => 'manual',
+    ]);
+    $php->questions()->create([
+        'type' => 'short_answer', 'difficulty' => 'hard', 'prompt' => 'b',
+        'reference_answer' => 'y', 'status' => 'draft', 'generated_by' => 'manual',
+    ]);
+
+    $this->get('/questions/manage?'.http_build_query(['topic_id' => $php->id]))
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page->has('draftQuestions.data', 1)->where('draftQuestions.data.0.prompt', 'b'));
+
+    $this->get('/questions/manage?'.http_build_query(['type' => 'mcq']))
+        ->assertOk()
+        ->assertInertia(fn ($page) => $page->has('draftQuestions.data', 1)->where('draftQuestions.data.0.prompt', 'a'));
 });

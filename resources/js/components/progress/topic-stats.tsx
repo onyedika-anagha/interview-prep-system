@@ -1,5 +1,7 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { type TopicProgress } from '@/types/interview-prep';
+import { Link } from '@inertiajs/react';
 import { Flame } from 'lucide-react';
 
 export function TopicStats({ stat }: { stat: TopicProgress }) {
@@ -20,6 +22,11 @@ export function TopicStats({ stat }: { stat: TopicProgress }) {
                     </div>
                 )}
             </CardContent>
+            <CardFooter>
+                <Button asChild size="sm" variant="outline" className="w-full">
+                    <Link href={`/topics/${stat.slug}/quiz?difficulty=easy`}>Practice</Link>
+                </Button>
+            </CardFooter>
         </Card>
     );
 }

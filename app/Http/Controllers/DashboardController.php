@@ -6,13 +6,13 @@ use App\Services\ProgressStats;
 use Inertia\Inertia;
 use Inertia\Response;
 
-class ProgressController extends Controller
+class DashboardController extends Controller
 {
     public function index(ProgressStats $stats): Response
     {
-        return Inertia::render('progress/index', [
-            'stats' => $stats->perTopic(),
+        return Inertia::render('dashboard', [
             'overall' => $stats->overall(),
+            'topics' => $stats->perTopic(),
         ]);
     }
 }

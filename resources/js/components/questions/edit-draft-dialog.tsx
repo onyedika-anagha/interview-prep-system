@@ -1,42 +1,35 @@
 import InputError from '@/components/input-error';
-import { TopicSelect } from '@/components/questions/topic-select';
-import { TestCaseResults } from '@/components/test-case-results';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { useManualQuestionForm } from '@/hooks/use-manual-question-form';
-import { difficultyLabel, languageLabel, TYPE_LABELS } from '@/lib/question-labels';
-import { type QuestionType, type TestCaseResult, type Topic } from '@/types/interview-prep';
+import { useEditDraftForm } from '@/hooks/use-edit-draft-form';
+import { difficultyLabel, DIFFICULTIES, languageLabel, TYPE_LABELS } from '@/lib/question-labels';
+import { type DraftQuestion, type QuestionType } from '@/types/interview-prep';
+import { useState } from 'react';
 
 const TYPES: QuestionType[] = ['mcq', 'short_answer', 'coding'];
 
-interface ManualQuestionFormProps {
-    topics: Topic[];
-    verification: TestCaseResult[] | null;
-}
-
-export function ManualQuestionForm({ topics, verification }: ManualQuestionFormProps) {
-    const { DIFFICULTIES, data, setData, setOption, addOption, removeOption, submit, verify, verifying, processing, errors } =
-        useManualQuestionForm(topics[0]?.id ?? '');
+export function EditDraftDialog({ question }: { question: DraftQuestion }) {
+    const [open, setOpen] = useState(false);
+    const { data, setData, setOption, addOption, removeOption, submit, processing, errors } = useEditDraftForm(question, () => setOpen(false));
 
     return (
-        <Card>
-            <CardHeader>
-                <CardTitle className="text-base">Add a question manually</CardTitle>
-            </CardHeader>
-            <form onSubmit={submit}>
-                <CardContent className="flex flex-col gap-4">
-                    <div className="grid gap-2">
-                        <Label>Topic</Label>
-                        <TopicSelect topics={topics} value={data.topic_id} onChange={(id) => setData('topic_id', id)} />
-                        <InputError message={errors.topic_id} />
-                    </div>
-
-                    <div className="grid gap-4 sm:grid-cols-3">
+        <Dialog open={open} onOpenChange={setOpen}>
+            <DialogTrigger asChild>
+                <Button size="sm" variant="outline">
+                    Edit
+                </Button>
+            </DialogTrigger>
+            <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-lg">
+                <DialogHeader>
+                    <DialogTitle>Edit draft question</DialogTitle>
+                </DialogHeader>
+                <form onSubmit={submit} className="flex flex-col gap-4">
+                    <div className="grid grid-cols-2 gap-4">
                         <div className="grid gap-2">
                             <Label>Type</Label>
                             <Select value={data.type} onValueChange={(v) => setData('type', v as QuestionType)}>
@@ -67,26 +60,11 @@ export function ManualQuestionForm({ topics, verification }: ManualQuestionFormP
                                 </SelectContent>
                             </Select>
                         </div>
-                        {data.type === 'coding' && (
-                            <div className="grid gap-2">
-                                <Label>Language</Label>
-                                <Select value={data.language} onValueChange={(v) => setData('language', v as 'javascript' | 'php')}>
-                                    <SelectTrigger>
-                                        <SelectValue placeholder="Choose" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="javascript">{languageLabel('javascript')}</SelectItem>
-                                        <SelectItem value="php">{languageLabel('php')}</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                                <InputError message={errors.language} />
-                            </div>
-                        )}
                     </div>
 
                     <div className="grid gap-2">
-                        <Label htmlFor="prompt">Prompt</Label>
-                        <Textarea id="prompt" value={data.prompt} onChange={(e) => setData('prompt', e.target.value)} required />
+                        <Label htmlFor="edit-prompt">Prompt</Label>
+                        <Textarea id="edit-prompt" value={data.prompt} onChange={(e) => setData('prompt', e.target.value)} required />
                         <InputError message={errors.prompt} />
                     </div>
 
@@ -100,7 +78,7 @@ export function ManualQuestionForm({ topics, verification }: ManualQuestionFormP
                             >
                                 {data.options.map((option, index) => (
                                     <div key={index} className="flex items-center gap-2">
-                                        <RadioGroupItem value={String(index)} id={`correct-option-${index}`} />
+                                        <RadioGroupItem value={String(index)} id={`edit-option-${index}`} />
                                         <Input
                                             value={option}
                                             onChange={(e) => setOption(index, e.target.value)}
@@ -125,9 +103,9 @@ export function ManualQuestionForm({ topics, verification }: ManualQuestionFormP
                         </div>
                     ) : (
                         <div className="grid gap-2">
-                            <Label htmlFor="reference_answer">Reference answer</Label>
+                            <Label htmlFor="edit-reference-answer">Reference answer</Label>
                             <Textarea
-                                id="reference_answer"
+                                id="edit-reference-answer"
                                 value={data.reference_answer}
                                 onChange={(e) => setData('reference_answer', e.target.value)}
                                 required
@@ -137,29 +115,40 @@ export function ManualQuestionForm({ topics, verification }: ManualQuestionFormP
                     )}
 
                     {data.type === 'coding' && (
-                        <div className="grid gap-2">
-                            <Label htmlFor="test_cases">Test cases (JSON array of {'{ input, expected_output }'})</Label>
-                            <Textarea
-                                id="test_cases"
-                                className="min-h-24 font-mono text-sm"
-                                value={data.test_cases}
-                                onChange={(e) => setData('test_cases', e.target.value)}
-                                placeholder='[{"input": 1, "expected_output": 2}]'
-                            />
-                            <InputError message={errors.test_cases} />
-                            <Button type="button" variant="outline" size="sm" className="self-start" onClick={verify} disabled={verifying}>
-                                {verifying ? 'Verifying…' : 'Verify reference answer against test cases'}
-                            </Button>
-                            {verification && <TestCaseResults results={verification} />}
-                        </div>
+                        <>
+                            <div className="grid gap-2">
+                                <Label>Language</Label>
+                                <Select value={data.language} onValueChange={(v) => setData('language', v as 'javascript' | 'php')}>
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Choose" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="javascript">{languageLabel('javascript')}</SelectItem>
+                                        <SelectItem value="php">{languageLabel('php')}</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                                <InputError message={errors.language} />
+                            </div>
+                            <div className="grid gap-2">
+                                <Label htmlFor="edit-test-cases">Test cases (JSON array of {'{ input, expected_output }'})</Label>
+                                <Textarea
+                                    id="edit-test-cases"
+                                    className="min-h-24 font-mono text-sm"
+                                    value={data.test_cases}
+                                    onChange={(e) => setData('test_cases', e.target.value)}
+                                />
+                                <InputError message={errors.test_cases} />
+                            </div>
+                        </>
                     )}
-                </CardContent>
-                <CardFooter>
-                    <Button type="submit" disabled={processing}>
-                        {processing ? 'Adding…' : 'Add question'}
-                    </Button>
-                </CardFooter>
-            </form>
-        </Card>
+
+                    <DialogFooter>
+                        <Button type="submit" disabled={processing}>
+                            {processing ? 'Saving…' : 'Save changes'}
+                        </Button>
+                    </DialogFooter>
+                </form>
+            </DialogContent>
+        </Dialog>
     );
 }

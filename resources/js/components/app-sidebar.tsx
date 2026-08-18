@@ -1,49 +1,38 @@
-import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
-import { type NavItem } from '@/types';
-import { Link } from '@inertiajs/react';
-import { BarChart3, BookOpen, Folder, LayoutGrid, ListChecks, PlusSquare } from 'lucide-react';
+import { type NavItem, type SharedData } from '@/types';
+import { Link, usePage } from '@inertiajs/react';
+import { BarChart3, LayoutGrid, ListChecks, PlusSquare } from 'lucide-react';
 import AppLogo from './app-logo';
 
-const mainNavItems: NavItem[] = [
-    {
-        title: 'Dashboard',
-        url: '/dashboard',
-        icon: LayoutGrid,
-    },
-    {
-        title: 'Topics',
-        url: '/topics',
-        icon: ListChecks,
-    },
-    {
-        title: 'Manage questions',
-        url: '/questions/manage',
-        icon: PlusSquare,
-    },
-    {
-        title: 'Progress',
-        url: '/progress',
-        icon: BarChart3,
-    },
-];
-
-const footerNavItems: NavItem[] = [
-    {
-        title: 'Repository',
-        url: 'https://github.com/laravel/react-starter-kit',
-        icon: Folder,
-    },
-    {
-        title: 'Documentation',
-        url: 'https://laravel.com/docs/starter-kits',
-        icon: BookOpen,
-    },
-];
-
 export function AppSidebar() {
+    const { draftQuestionCount } = usePage<SharedData>().props;
+
+    const mainNavItems: NavItem[] = [
+        {
+            title: 'Dashboard',
+            url: '/dashboard',
+            icon: LayoutGrid,
+        },
+        {
+            title: 'Topics',
+            url: '/topics',
+            icon: ListChecks,
+        },
+        {
+            title: 'Manage questions',
+            url: '/questions/manage',
+            icon: PlusSquare,
+            badge: draftQuestionCount,
+        },
+        {
+            title: 'Progress',
+            url: '/progress',
+            icon: BarChart3,
+        },
+    ];
+
     return (
         <Sidebar collapsible="icon" variant="inset">
             <SidebarHeader>
@@ -63,7 +52,6 @@ export function AppSidebar() {
             </SidebarContent>
 
             <SidebarFooter>
-                <NavFooter items={footerNavItems} className="mt-auto" />
                 <NavUser />
             </SidebarFooter>
         </Sidebar>

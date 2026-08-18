@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Question;
 use App\Models\Topic;
 use App\Services\AiProvider;
+use App\Services\CodeExecutionService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Validator;
@@ -13,9 +14,9 @@ use Inertia\Response;
 
 class QuestionController extends Controller
 {
-    public function index(): Response
+    public function index(Request $request): Response
     {
-        return $this->renderManage();
+        return $this->renderManage([], $request->only(['topic_id', 'type', 'difficulty']));
     }
 
     public function generate(Request $request, AiProvider $ai): Response
@@ -35,6 +36,7 @@ class QuestionController extends Controller
                 'difficulty' => $question['difficulty'] ?? $validated['difficulty'],
                 'prompt' => $question['prompt'],
                 'reference_answer' => $question['reference_answer'],
+                'options' => $question['options'] ?? null,
                 'language' => $question['language'] ?? null,
                 'test_cases' => $question['test_cases'] ?? null,
                 'status' => 'draft',
@@ -79,7 +81,8 @@ class QuestionController extends Controller
             $rowValidator = Validator::make(is_array($row) ? $row : [], Question::rules());
 
             if ($rowValidator->fails()) {
-                $errors[] = "Row {$index}: ".$rowValidator->errors()->first();
+                $rowLabel = is_int($index) ? $index + 1 : $index;
+                $errors[] = "Row {$rowLabel}: ".implode(' ', $rowValidator->errors()->all());
 
                 continue;
             }
@@ -94,9 +97,36 @@ class QuestionController extends Controller
         return $this->renderManage(['result' => ['type' => 'imported', 'created' => $created, 'errors' => $errors]]);
     }
 
+    /**
+     * Run a reference answer against its test cases before saving, closing the
+     * gap where a bad reference answer only surfaces once a student's correct
+     * submission gets marked wrong.
+     */
+    public function verify(Request $request, CodeExecutionService $executor): Response
+    {
+        $validated = $request->validate([
+            'language' => 'required|in:javascript,php',
+            'reference_answer' => 'required|string',
+            'test_cases' => 'required|array|min:1',
+        ]);
+
+        $results = $executor->run($validated['language'], $validated['reference_answer'], $validated['test_cases']);
+
+        return $this->renderManage(['verification' => $results]);
+    }
+
     public function approve(Question $question): Response
     {
         $question->update(['status' => 'approved']);
+
+        return $this->renderManage();
+    }
+
+    public function update(Request $request, Question $question): Response
+    {
+        $validated = $request->validate(Question::rules());
+
+        $question->update($validated);
 
         return $this->renderManage();
     }
@@ -108,15 +138,58 @@ class QuestionController extends Controller
         return $this->renderManage();
     }
 
-    private function renderManage(array $extra = []): Response
+    public function bulkApprove(Request $request): Response
     {
+        $validated = $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'integer|exists:questions,id',
+        ]);
+
+        Question::whereIn('id', $validated['ids'])->where('status', 'draft')->update(['status' => 'approved']);
+
+        return $this->renderManage();
+    }
+
+    public function bulkReject(Request $request): Response
+    {
+        $validated = $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'integer|exists:questions,id',
+        ]);
+
+        Question::whereIn('id', $validated['ids'])->where('status', 'draft')->delete();
+
+        return $this->renderManage();
+    }
+
+    /**
+     * @param  array<string, mixed>  $filters
+     */
+    private function renderManage(array $extra = [], array $filters = []): Response
+    {
+        $query = Question::with('topic:id,name')->where('status', 'draft');
+
+        if (! empty($filters['topic_id'])) {
+            $query->where('topic_id', $filters['topic_id']);
+        }
+        if (! empty($filters['type'])) {
+            $query->where('type', $filters['type']);
+        }
+        if (! empty($filters['difficulty'])) {
+            $query->where('difficulty', $filters['difficulty']);
+        }
+
         return Inertia::render('questions/manage', array_merge([
             'topics' => Topic::orderBy('name')->get(['id', 'name', 'slug']),
-            'draftQuestions' => Question::with('topic:id,name')
-                ->where('status', 'draft')
-                ->latest()
-                ->get(['id', 'topic_id', 'type', 'difficulty', 'prompt', 'generated_by', 'created_at']),
+            'draftQuestions' => $query->latest()
+                ->paginate(10, [
+                    'id', 'topic_id', 'type', 'difficulty', 'prompt', 'reference_answer',
+                    'options', 'language', 'test_cases', 'generated_by', 'created_at',
+                ])
+                ->withQueryString(),
+            'filters' => (object) $filters,
             'result' => null,
+            'verification' => null,
         ], $extra));
     }
 }

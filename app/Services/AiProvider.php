@@ -8,7 +8,7 @@ use App\Models\Topic;
 interface AiProvider
 {
     /**
-     * @return array<int, array{type: string, difficulty: string, prompt: string, reference_answer: string, test_cases: array|null}>
+     * @return array<int, array{type: string, difficulty: string, prompt: string, reference_answer: string, options: array|null, test_cases: array|null}>
      */
     public function generateQuestions(Topic $topic, string $difficulty, int $count): array;
 

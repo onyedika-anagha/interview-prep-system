@@ -1,3 +1,4 @@
+import { TestCaseResults } from '@/components/test-case-results';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { type Attempt, type RevealedQuestion } from '@/types/interview-prep';
@@ -31,22 +32,8 @@ export function ResultFeedback({ question, attempt }: ResultFeedbackProps) {
                     <CardHeader>
                         <CardTitle className="text-base">Test cases</CardTitle>
                     </CardHeader>
-                    <CardContent className="flex flex-col gap-2">
-                        {attempt.execution_result.map((result, index) => (
-                            <div key={index} className="flex items-start gap-2 rounded-md border p-2 text-sm">
-                                {result.passed ? (
-                                    <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-green-600" />
-                                ) : (
-                                    <XCircle className="mt-0.5 size-4 shrink-0 text-destructive" />
-                                )}
-                                <div className="flex flex-col gap-1">
-                                    <span>Input: {JSON.stringify(result.input)}</span>
-                                    <span>Expected: {JSON.stringify(result.expected_output)}</span>
-                                    <span>Got: {JSON.stringify(result.actual_output)}</span>
-                                    {result.error && <span className="text-destructive">{result.error}</span>}
-                                </div>
-                            </div>
-                        ))}
+                    <CardContent>
+                        <TestCaseResults results={attempt.execution_result} />
                     </CardContent>
                 </Card>
             )}
@@ -54,6 +41,11 @@ export function ResultFeedback({ question, attempt }: ResultFeedbackProps) {
             <Card>
                 <CardHeader>
                     <CardTitle className="text-base">Reference answer</CardTitle>
+                    {question.type === 'coding' && (
+                        <p className="text-muted-foreground text-sm">
+                            Includes the stdin/stdout wrapper used for automated grading — the core logic is what matters.
+                        </p>
+                    )}
                 </CardHeader>
                 <CardContent className="whitespace-pre-wrap font-mono text-sm text-muted-foreground">{question.reference_answer}</CardContent>
             </Card>

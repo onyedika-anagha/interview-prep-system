@@ -1,0 +1,26 @@
+[
+    {
+        "type": "mcq",
+        "difficulty": "easy",
+        "prompt": "Which HTTP method is idempotent?",
+        "reference_answer": "GET",
+        "options": ["GET", "POST", "PATCH"]
+    },
+    {
+        "type": "short_answer",
+        "difficulty": "medium",
+        "prompt": "What does the acronym SOLID stand for?",
+        "reference_answer": "Single responsibility, Open-closed, Liskov substitution, Interface segregation, Dependency inversion."
+    },
+    {
+        "type": "coding",
+        "difficulty": "easy",
+        "prompt": "Write a function that returns the sum of two numbers.",
+        "reference_answer": "<?php\n$data = json_decode(file_get_contents('php://stdin'), true);\necho json_encode($data['a'] + $data['b']);\n",
+        "language": "php",
+        "test_cases": [
+            { "input": { "a": 2, "b": 3 }, "expected_output": 5 },
+            { "input": { "a": -1, "b": 1 }, "expected_output": 0 }
+        ]
+    }
+]
